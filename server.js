@@ -238,3 +238,140 @@ const addEmployee = () => {
       });
   });
 };
+
+//CK
+const addRole = () => {
+  const addRoleQuery = `SELECT * FROM roles; SELECT * FROM department;`;
+  connection.query(addRoleQuery, (err, results) => {
+    if (err) throw err;
+
+    console.log(chalk.blue("List of current roles"));
+    console.table(results[0]);
+
+    inquirer
+      .prompt([
+        {
+          name: "newTitle",
+          type: "input",
+          message: "What is the new title?",
+        },
+        {
+          name: "newSalary",
+          type: "input",
+          message: "What is the salary amount for the new title:",
+        },
+        {
+          name: "dept",
+          type: "list",
+          // A FX that creates a new array from the department table
+          //and loops through the name column and returns the new array
+          choice: function () {
+            let choiceArr = results[1].map((choice) => choice.name);
+            return choiceArr;
+          },
+          message: "Choose the department for the new title?",
+        },
+      ])
+      .then((answer) => {
+        connection.query(`INSERT INTO roles(title, salary, department_id) 
+                VALUES("${answer.newTitle}","${answer.newSalary}", 
+                (SELECT did FROM department WHERE name = "${answer.dept}"));`);
+        badCompany();
+      });
+  });
+};
+
+const viewDepartments = () => {
+  const query = "SELECT * FROM department";
+  connection.query(query, (err, results) => {
+    if (err) throw err;
+    console.table(results);
+    badCompany();
+  });
+};
+
+
+const viewEmployees = () => {
+  const query = "SELECT * FROM employee";
+  connection.query(query, (err, results) => {
+    if (err) throw err;
+    console.table(results);
+    badCompany();
+  });
+};
+
+
+const viewRoles = () => {
+  const query = "SELECT * FROM roles";
+  connection.query(query, (err, results) => {
+    if (err) throw err;
+    console.table(results);
+    badCompany();
+  });
+};
+
+// CK
+const viewEmpByManager = () => {
+  connection.query(managerQuery, (err, results) => {
+    if (err) throw err;
+
+    inquirer
+      .prompt([
+        {
+          name: "m_choice",
+          type: "list",
+          choices: function () {
+            let choiceArr = results.map((choice) => choice.full_name);
+            return choiceArr;
+          },
+          message: "Select a Manager:",
+        },
+      ])
+      .then((answer) => {
+        const managerQuery2 = `SELECT e.id, e.first_name AS "First Name", e.last_name AS "Last Name", IFNULL(r.title, "No Data") AS "Title", IFNULL(d.name, "No Data") AS "Department", IFNULL(r.salary, 'No Data') AS "Salary", CONCAT(m.first_name," ",m.last_name) AS "Manager"
+                              FROM employee e
+                              LEFT JOIN roles r 
+                              ON r.id = e.role_id 
+                              LEFT JOIN department d 
+                              ON d.did = r.department_id
+                              LEFT JOIN employee m ON m.id = e.manager_id
+                              WHERE CONCAT(m.first_name," ",m.last_name) = ?
+                              ORDER BY e.id;`;
+        connection.query(managerQuery2, [answer.m_choice], (err, results) => {
+          if (err) throw err;
+
+          console.log(" ");
+          console.table(chalk.blue("Employee by Manager"), results);
+
+          badCompany();
+        });
+      });
+  });
+};
+// CK
+const updateEmpRole = () => {
+  inquirer
+    .prompt([
+      {
+        name: "id",
+        type: "input",
+        message: "What is your employee ID?",
+      },
+      {
+        name: "role",
+        type: "input",
+        message: "What is your role ID?",
+      },
+    ])
+    .then((answers) => {
+      const query = `UPDATE employee SET role_id = ? WHERE id = ?`;
+      connection.query(query, [answers.id, answers.role], (err, results) => {
+        if (err) throw err;
+        console.log(results);
+        badCompany();
+      });
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
