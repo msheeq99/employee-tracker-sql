@@ -6,3 +6,6 @@ This web application is a SQL employee tracker, this is used to keep track of em
 
 This project was build to demonstrate my ability of using node.js, mysql2, and console.table. Using all of these together has allowed me to explore different avenues within the backend.
 
+## Walkthrough 
+
+
