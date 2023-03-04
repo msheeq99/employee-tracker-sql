@@ -7,5 +7,8 @@ This web application is a SQL employee tracker, this is used to keep track of em
 This project was build to demonstrate my ability of using node.js, mysql2, and console.table. Using all of these together has allowed me to explore different avenues within the backend.
 
 ## Walkthrough 
+[scrnli_04_03_2023_01-28-57.webm](https://user-images.githubusercontent.com/113865888/222868306-c85989c4-ceae-4082-9d4a-8cc817b907fc.webm)
 
 
+## Git-Hub Link
+https://github.com/msheeq99/employee-tracker-sql/
